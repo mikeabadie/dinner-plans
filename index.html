@@ -1,0 +1,451 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dinner Plans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=Outfit:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column, one screen per step. Looks like a dinner invite until the sealed box at the end. */
+:root {
+  --bg: #F3F7F6;
+  --surface: #FFFFFF;
+  --fg: #12302A;
+  --muted: #4E6B64;
+  --line: #CFDDD9;
+  --emerald: #0F7A58;
+  --emerald-deep: #0A5640;
+  --on-emerald: #F3F7F6;
+  --gold: #A67C2E;
+  --ice: #DCEBF1;
+  --font-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --font-body: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1A17;
+    --surface: #12272A;
+    --fg: #E6F1EE;
+    --muted: #93B0A9;
+    --line: #25433F;
+    --emerald: #35C694;
+    --emerald-deep: #1F9C75;
+    --on-emerald: #06201A;
+    --gold: #D9B566;
+    --ice: #1B3A44;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1A17;
+  --surface: #12272A;
+  --fg: #E6F1EE;
+  --muted: #93B0A9;
+  --line: #25433F;
+  --emerald: #35C694;
+  --emerald-deep: #1F9C75;
+  --on-emerald: #06201A;
+  --gold: #D9B566;
+  --ice: #1B3A44;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-inline: 20px;
+  padding-block: 28px 48px;
+  min-height: 100%;
+}
+.wrap { max-width: 30rem; margin-inline: auto; display: flex; flex-direction: column; gap: 24px; }
+.eyebrow {
+  font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); font-weight: 600; margin: 0;
+}
+h1, h2 {
+  font-family: var(--font-display); font-weight: 700; margin: 0;
+  line-height: 1.1; text-wrap: balance; letter-spacing: -0.01em;
+}
+h1 { font-size: clamp(2.4rem, 11vw, 3.4rem); }
+h2 { font-size: clamp(1.9rem, 8vw, 2.4rem); }
+h1 em, h2 em { font-style: italic; font-weight: 500; color: var(--emerald); }
+p { margin: 0; text-wrap: pretty; }
+.lede { color: var(--muted); font-size: 1.05rem; max-width: 36ch; }
+.step { display: flex; flex-direction: column; gap: 22px; }
+
+/* Progress */
+.dots { display: flex; gap: 6px; }
+.dots span { width: 22px; height: 3px; border-radius: 2px; background: var(--line); }
+.dots span.on { background: var(--gold); }
+
+/* Buttons */
+.btn {
+  font: inherit; font-weight: 600; font-size: 1rem;
+  background: var(--emerald); color: var(--on-emerald);
+  border: 0; border-radius: 10px; padding: 14px 22px; min-height: 48px;
+  cursor: pointer; align-self: flex-start;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1.5px solid var(--line); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.link {
+  font: inherit; background: none; border: 0; padding: 8px 0; cursor: pointer;
+  color: var(--muted); text-decoration: underline; text-underline-offset: 3px;
+}
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+/* Name field */
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.field input {
+  font: inherit; font-size: 1.25rem; color: var(--fg); background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 14px; width: 100%; min-height: 52px;
+}
+.field input:focus { border-color: var(--emerald); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--emerald) 30%, transparent); }
+
+/* Questions */
+.round { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.1em; text-transform: uppercase; }
+.picks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pick {
+  font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 1.45rem; line-height: 1.15;
+  color: var(--fg); background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px;
+  min-height: 9rem; padding: 16px 10px; cursor: pointer; text-wrap: balance; min-width: 0;
+  overflow-wrap: anywhere;
+}
+.picks.many .pick { min-height: 4.25rem; font-size: 1.15rem; padding: 10px; }
+.pick[aria-pressed="true"] { background: var(--emerald); border-color: var(--emerald); color: var(--on-emerald); }
+.hint { font-size: 0.85rem; color: var(--muted); min-height: 1.3em; }
+
+/* Sizes */
+.sizes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.size {
+  font: inherit; font-variant-numeric: tabular-nums; font-weight: 500; color: var(--fg);
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px;
+  min-height: 48px; cursor: pointer; padding: 0;
+}
+.size[aria-pressed="true"] { background: var(--emerald); border-color: var(--emerald); color: var(--on-emerald); }
+.size.wide { grid-column: 1 / -1; font-size: 0.95rem; color: var(--muted); }
+.size.wide[aria-pressed="true"] { color: var(--on-emerald); }
+
+/* Hover only where a real pointer exists, so nothing looks pre-selected on a phone */
+@media (hover: hover) {
+  .btn:hover { background: var(--emerald-deep); }
+  .btn.ghost:hover { border-color: var(--emerald); background: transparent; }
+  .pick:not([aria-pressed="true"]):hover { border-color: var(--emerald); background: var(--ice); }
+  .size:hover { border-color: var(--emerald); }
+}
+
+/* Send step */
+.note {
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px;
+  padding: 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.note label { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.note textarea {
+  font: inherit; color: var(--fg); background: var(--bg);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; width: 100%;
+  min-height: 6.5rem; resize: vertical; line-height: 1.5;
+}
+.status { font-size: 0.9rem; color: var(--emerald); min-height: 1.4em; }
+
+/* Gift box */
+.boxbtn {
+  background: none; border: 0; padding: 0; cursor: pointer; align-self: center; width: min(15rem, 80%);
+  display: flex; flex-direction: column; align-items: center; gap: 14px; color: var(--fg); font: inherit;
+}
+.boxbtn svg { width: 100%; height: auto; overflow: visible; }
+.boxbtn .tap { font-family: var(--font-display); font-style: italic; font-size: 1.2rem; color: var(--emerald); }
+.box-body { fill: var(--emerald); }
+.box-lid { fill: var(--emerald-deep); }
+.box-ribbon { fill: var(--gold); }
+.lid-group { transform-box: fill-box; transform-origin: 20% 100%; transition: transform 0.6s ease; }
+.boxbtn.open .lid-group { transform: translateY(-34px) rotate(-14deg); }
+@media (prefers-reduced-motion: reduce) { .lid-group { transition: none; } }
+
+/* Reveal */
+.reveal { align-items: flex-start; }
+.ringwrap { width: min(18rem, 100%); align-self: center; }
+.ringwrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ring-band { fill: none; stroke: var(--gold); stroke-width: 12; }
+.ring-band-hi { fill: none; stroke: var(--bg); stroke-opacity: 0.35; stroke-width: 2; }
+.stone-e { fill: var(--emerald); fill-opacity: 0.35; stroke: var(--emerald); stroke-width: 1.6; stroke-linejoin: round; }
+.stone-d { fill: var(--ice); stroke: var(--fg); stroke-width: 1.4; }
+.stone-f { fill: none; stroke: var(--fg); stroke-width: 1; stroke-opacity: 0.7; }
+.stone-ef { fill: none; stroke: var(--emerald); stroke-width: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .stone { transform-box: fill-box; transform-origin: center; animation: pop 0.5s ease-out both; }
+}
+@keyframes pop { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+.reveal .details { font-family: var(--font-display); font-style: italic; font-size: 1.3rem; color: var(--gold); }
+.reveal .dinner { color: var(--muted); font-size: 0.95rem; }
+</style>
+
+<main class="wrap">
+  <div class="dots" id="dots" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+
+  <!-- 0: cover -->
+  <section class="step" id="s0">
+    <h1>Dinner <em>next week?</em></h1>
+    <div class="field">
+      <label for="name">Your name</label>
+      <input id="name" type="text" autocomplete="off" maxlength="40">
+    </div>
+    <button class="btn" id="start" type="button" disabled>Let's plan it</button>
+  </section>
+
+  <!-- 1: questions -->
+  <section class="step" id="s1" hidden>
+    <p class="round" id="roundlabel"></p>
+    <h2 id="prompt"></h2>
+    <div class="picks" id="picks"></div>
+    <p class="hint" id="pickhint"></p>
+    <div class="row">
+      <button class="btn" id="nextq" type="button" disabled>Next</button>
+      <button class="btn ghost" id="backq" type="button">Back</button>
+    </div>
+  </section>
+
+  <!-- 2: size -->
+  <section class="step" id="s2" hidden>
+    <h2>Last one: your <em>ring size?</em></h2>
+    <div class="sizes" id="sizes" role="group" aria-label="Ring size"></div>
+    <div class="row">
+      <button class="btn" id="next2" type="button" disabled>Next</button>
+      <button class="btn ghost" id="back2" type="button">Back</button>
+    </div>
+  </section>
+
+  <!-- 3: send back -->
+  <section class="step" id="s3" hidden>
+    <h2>Text this to <em>Mike</em> to lock it in.</h2>
+    <div class="note">
+      <label for="msg">Your answers</label>
+      <textarea id="msg" readonly></textarea>
+      <div class="row">
+        <button class="btn" id="copy" type="button">Copy answers</button>
+      </div>
+      <p class="status" id="status" role="status"></p>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="sent" type="button">Sent it</button>
+      <button class="link" id="redo" type="button">Start over</button>
+    </div>
+  </section>
+
+  <!-- 4: box -->
+  <section class="step" id="s4" hidden>
+    <button class="boxbtn" id="box" type="button" aria-label="Open the box">
+      <svg viewBox="0 0 200 170" aria-hidden="true">
+        <rect class="box-body" x="20" y="70" width="160" height="90" rx="4"/>
+        <rect class="box-ribbon" x="92" y="70" width="16" height="90"/>
+        <g class="lid-group">
+          <rect class="box-lid" x="10" y="42" width="180" height="32" rx="4"/>
+          <rect class="box-ribbon" x="92" y="42" width="16" height="32"/>
+          <path class="box-ribbon" d="M100 42 C80 14 52 20 64 38 C70 46 92 42 100 42 Z M100 42 C120 14 148 20 136 38 C130 46 108 42 100 42 Z"/>
+        </g>
+      </svg>
+      <span class="tap">Tap to open</span>
+    </button>
+  </section>
+
+  <!-- 5: reveal -->
+  <section class="step reveal" id="s5" hidden>
+    <p class="eyebrow" id="revealeyebrow"></p>
+    <h2>It is an <em>eternity band.</em></h2>
+    <div class="ringwrap"><svg id="ring" viewBox="0 0 240 240" role="img" aria-label="An eternity band"></svg></div>
+    <p class="details" id="details"></p>
+    <p class="lede">For the baby, your birthday and our anniversary. A circle with no end, one stone for every reason I love you.</p>
+    <p class="dinner" id="dinner"></p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var steps = ["s0", "s1", "s2", "s3", "s4", "s5"];
+  var dotAt = [0, 1, 2, 3, 4, 4];
+  var dots = document.querySelectorAll("#dots span");
+  var state = { name: "", answers: {}, stone: null, size: null };
+
+  function show(i) {
+    steps.forEach(function (id, n) { document.getElementById(id).hidden = n !== i; });
+    dots.forEach(function (d, n) { d.classList.toggle("on", n <= dotAt[i]); });
+    window.scrollTo(0, 0);
+  }
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  /* 0: name */
+  var nameIn = document.getElementById("name");
+  var startBtn = document.getElementById("start");
+  nameIn.addEventListener("input", function () { startBtn.disabled = nameIn.value.trim() === ""; });
+  nameIn.addEventListener("keydown", function (e) { if (e.key === "Enter" && !startBtn.disabled) startBtn.click(); });
+  startBtn.addEventListener("click", function () {
+    state.name = nameIn.value.trim();
+    state.answers = {}; state.stone = null; state.size = null; round = 0;
+    sizes.querySelectorAll(".size").forEach(function (o) { o.setAttribute("aria-pressed", "false"); });
+    document.getElementById("next2").disabled = true;
+    renderRound(); show(1);
+  });
+
+  /* 1: questions. Dinner first, then "quick favorites" where the stone hides in plain sight. */
+  var rounds = [
+    { q: "Which nights work next week?", opts: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], key: "night", multi: true, hint: "Pick all that work." },
+    { q: "What are you in the mood for?", opts: ["Italian", "Sushi", "Steak", "Mediterranean", "Mexican", "Surprise me"], key: "food" },
+    { q: "Early or late?", opts: ["Early (6pm)", "Later (8pm)"], key: "time" },
+    { q: "Beach or mountains?", opts: ["Beach", "Mountains"], key: "trip", tag: "Quick favorites" },
+    { q: "Sweet or salty?", opts: ["Sweet", "Salty"], key: "snack", tag: "Quick favorites" },
+    { q: "Emerald or round diamonds?", opts: ["Emerald", "Round diamonds"], key: "stone", tag: "Quick favorites" }
+  ];
+  var round = 0;
+  function renderRound() {
+    var r = rounds[round];
+    document.getElementById("roundlabel").textContent = (r.tag ? r.tag + " · " : "") + (round + 1) + " of " + rounds.length;
+    document.getElementById("prompt").textContent = r.q;
+    document.getElementById("pickhint").textContent = r.hint || "";
+    var picks = document.getElementById("picks");
+    var next = document.getElementById("nextq");
+    picks.textContent = "";
+    picks.className = "picks" + (r.opts.length > 2 ? " many" : "");
+    var saved = state.answers[r.key];
+    var chosen = r.multi ? (saved || []).slice() : (saved ? [saved] : []);
+    next.disabled = chosen.length === 0;
+    r.opts.forEach(function (label) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "pick"; b.textContent = label;
+      b.setAttribute("aria-pressed", chosen.indexOf(label) > -1 ? "true" : "false");
+      b.addEventListener("click", function () {
+        var i = chosen.indexOf(label);
+        if (r.multi) {
+          if (i > -1) chosen.splice(i, 1); else chosen.push(label);
+        } else {
+          chosen = [label];
+        }
+        picks.querySelectorAll(".pick").forEach(function (o) {
+          o.setAttribute("aria-pressed", chosen.indexOf(o.textContent) > -1 ? "true" : "false");
+        });
+        if (r.multi) {
+          chosen.sort(function (x, y) { return r.opts.indexOf(x) - r.opts.indexOf(y); });
+          state.answers[r.key] = chosen.slice();
+        } else {
+          state.answers[r.key] = label;
+          if (r.key === "stone") state.stone = label;
+        }
+        next.disabled = chosen.length === 0;
+      });
+      picks.appendChild(b);
+    });
+  }
+  document.getElementById("nextq").addEventListener("click", function () {
+    round += 1;
+    if (round < rounds.length) { renderRound(); window.scrollTo(0, 0); } else { show(2); }
+  });
+  document.getElementById("backq").addEventListener("click", function () {
+    if (round === 0) { show(0); } else { round -= 1; renderRound(); window.scrollTo(0, 0); }
+  });
+
+  /* 2: size */
+  var sizes = document.getElementById("sizes");
+  for (var v = 4; v <= 9.5; v += 0.5) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "size"; b.textContent = String(v);
+    b.setAttribute("aria-pressed", "false"); b.dataset.size = String(v);
+    sizes.appendChild(b);
+  }
+  var ns = document.createElement("button");
+  ns.type = "button"; ns.className = "size wide"; ns.textContent = "Not sure";
+  ns.setAttribute("aria-pressed", "false"); ns.dataset.size = "unsure";
+  sizes.appendChild(ns);
+  sizes.addEventListener("click", function (e) {
+    var t = e.target.closest(".size");
+    if (!t) return;
+    sizes.querySelectorAll(".size").forEach(function (o) { o.setAttribute("aria-pressed", "false"); });
+    t.setAttribute("aria-pressed", "true");
+    state.size = t.dataset.size;
+    document.getElementById("next2").disabled = false;
+  });
+  document.getElementById("back2").addEventListener("click", function () {
+    round = rounds.length - 1; renderRound(); show(1);
+  });
+  document.getElementById("next2").addEventListener("click", function () {
+    var a = state.answers;
+    var sizeText = state.size === "unsure"
+      ? "Not sure of my ring size, you will have to figure that out."
+      : "Ring size " + state.size + ".";
+    var when = a.night.join("/");
+    document.getElementById("msg").value =
+      state.name + " here. Dinner: " + when + ", " + a.food + ", " + a.time + ". " +
+      a.stone + ". " + sizeText + " Now what is this really about?";
+    document.getElementById("status").textContent = "";
+    show(3);
+  });
+
+  /* 3: copy */
+  document.getElementById("copy").addEventListener("click", function () {
+    var ta = document.getElementById("msg");
+    var status = document.getElementById("status");
+    function fallback() {
+      ta.focus(); ta.select();
+      status.textContent = "Text selected. Press and hold, then tap Copy.";
+    }
+    try {
+      navigator.clipboard.writeText(ta.value).then(function () {
+        status.textContent = "Copied. Paste it into a text to Mike.";
+      }, fallback);
+    } catch (err) { fallback(); }
+  });
+  document.getElementById("redo").addEventListener("click", function () {
+    nameIn.value = state.name; startBtn.disabled = state.name === "";
+    show(0);
+  });
+  document.getElementById("sent").addEventListener("click", function () { show(4); });
+
+  /* 4: box */
+  var opened = false;
+  document.getElementById("box").addEventListener("click", function () {
+    if (opened) return;
+    opened = true;
+    var btn = this;
+    btn.classList.add("open");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(function () { buildReveal(); show(5); opened = false; btn.classList.remove("open"); }, reduce ? 0 : 750);
+  });
+
+  /* 5: reveal */
+  function buildReveal() {
+    var svg = document.getElementById("ring");
+    svg.textContent = "";
+    var cx = 120, cy = 120, R = 88, n = 18;
+    el("circle", { "class": "ring-band", cx: cx, cy: cy, r: R }, svg);
+    el("circle", { "class": "ring-band-hi", cx: cx, cy: cy, r: R - 4 }, svg);
+    var isEmerald = state.stone === "Emerald";
+    for (var i = 0; i < n; i++) {
+      var ang = (i / n) * Math.PI * 2 - Math.PI / 2;
+      var x = cx + R * Math.cos(ang), y = cy + R * Math.sin(ang);
+      var deg = ang * 180 / Math.PI + 90;
+      var g = el("g", { "class": "stone", transform: "translate(" + x.toFixed(2) + " " + y.toFixed(2) + ") rotate(" + deg.toFixed(1) + ")" }, svg);
+      g.style.animationDelay = (i * 90) + "ms";
+      if (isEmerald) {
+        el("rect", { "class": "stone-e", x: -8, y: -6, width: 16, height: 12, rx: 2 }, g);
+        el("rect", { "class": "stone-ef", x: -4.5, y: -3, width: 9, height: 6, rx: 1 }, g);
+      } else {
+        el("circle", { "class": "stone-d", cx: 0, cy: 0, r: 7.5 }, g);
+        el("circle", { "class": "stone-f", cx: 0, cy: 0, r: 3.6 }, g);
+      }
+    }
+    var a = state.answers;
+    document.getElementById("revealeyebrow").textContent = "For " + state.name;
+    var sizeBit = state.size === "unsure" ? "" : ", size " + state.size;
+    document.getElementById("details").textContent = (isEmerald ? "Emeralds" : "Round diamonds") + sizeBit + ". All the way around.";
+    document.getElementById("dinner").textContent = "Dinner is still on: " + a.night.join(" or ") + ", " + a.food.toLowerCase() + ", " + a.time.toLowerCase() + ".";
+  }
+})();
+</script>
+
+</body></html>
